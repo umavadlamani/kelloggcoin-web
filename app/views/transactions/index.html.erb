@@ -1,8 +1,41 @@
 <h1>KelloggCoin Ledger</h1>
 
 <!-- Step 1: List all transactions, starting with the ICO -->
+<% transactions = Transaction.all %>
+
+<p>There are <%=transactions.count%> transactions </p>
+
+<ul>
+<%for transaction in transactions%>
+  <%from_user = User.find_by({"id" => transaction["from_user_id"]})%>
+  <%to_user = User.find_by({"id" => transaction["to_user_id"]})%>
+  <%if transaction["from_user_id"] == nil %>
+    <li> Initial Coin Offering of <%= transaction["amount"]%> KC to <%=to_user["name"]%></li>
+  <%else%%>  
+    <li><%= transaction["amount"]%> KC from <%=from_user["name"]%> to <%=to_user["name"]%></li>
+  <%end%>  
+<%end%>
+</ul>
 
 <!-- Step 2: Calculate and display the balances -->
+<%users = [1, 2, 3, 4, 5] %>
+<%balances = {1 => 0, 2 => 0 , 3 => 0, 4 => 0, 5 => 0}%>
+<%for transaction in transactions%>
+  <%for user in users %>
+    <%if transaction["to_user_id"] == user%>
+      <%balances[user] = balances[user]+transaction["amount"]%>
+    <%elsif transaction["from_user_id"] == user%>
+      <%balances[user] = balances[user]-transaction["amount"]%>
+    <%end%>
+  <%end%>
+<%end%>
+
+<ul>
+  <%for user in users%>
+  <%person = User.find_by({"id" => user})%>
+  <li>Balance for <%=person["name"]%>: <%=balances[user]%> KC</li>
+  <%end%>
+</ul>
 
 <!-- 
 Expected balances:
